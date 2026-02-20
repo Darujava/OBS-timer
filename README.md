@@ -1,6 +1,6 @@
-# OBS-timer
-A site for generating HTML files to display timers or Pomodoro timers in OBS or StreamLab
 # OBS Timer HTML Generator
+
+![OBS Timer Screenshot](screenshot.png)
 
 A web-based generator for creating customizable HTML timers for streaming.
 
@@ -10,7 +10,8 @@ This tool allows you to generate ready-to-use HTML files for:
 - Stopwatch
 - Pomodoro Timer
 
-Designed for use with OBS Studio and Streamlabs Desktop.
+🌐 Live Site:  
+https://darujava.github.io/OBS-timer/
 
 ---
 
@@ -21,14 +22,8 @@ Designed for use with OBS Studio and Streamlabs Desktop.
 - Custom text color
 - Adjustable timer settings
 - Pomodoro interval configuration
-- Works as Media Source in OBS
+- Works as Media Source
 - Works as Browser Source
-
----
-
-## 🌐 Live Demo
-
-https://darujava.github.io/OBS-timer/
 
 ---
 
@@ -43,9 +38,9 @@ https://darujava.github.io/OBS-timer/
 
 ### Method 1: Use Generated HTML (Local File)
 
-1. Open the generator site
-2. Configure your timer
-3. Download the generated HTML file
+1. Open the generator site  
+2. Configure your timer  
+3. Download the generated HTML file  
 4. In OBS:
    - Add **Media Source**
    - Enable "Local File"
@@ -55,12 +50,12 @@ https://darujava.github.io/OBS-timer/
 
 ### Method 2: Use as Browser Source
 
-1. Open the GitHub Pages URL
-2. Generate your configuration
-3. Copy the output file or use URL (if supported)
+1. Open the GitHub Pages site  
+2. Configure your timer  
+3. Use generated file or URL  
 4. In OBS:
    - Add **Browser Source**
-   - Set width / height
+   - Set width / height (example: 800x600)
    - Load the file
 
 ---
@@ -84,15 +79,6 @@ You are free to use, modify, and distribute this project.
 
 ---
 
-## 💡 Future Improvements
+## ⭐ Support
 
-- URL parameter support
-- Animation effects
-- Sound notifications
-- Preset themes
-
----
-
-## ⭐ If you find this useful
-
-Consider giving this repository a star!
+If you find this project useful, consider giving it a star.
