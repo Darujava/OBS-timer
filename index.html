@@ -275,7 +275,7 @@
         </select>
       </div>
 
-      <div class="row">
+      <div id="countdownOptions" class="row">
         <div>
           <label for="hours">開始時間（時）</label>
           <input id="hours" type="number" min="0" value="0" />
@@ -287,7 +287,7 @@
       </div>
 
       <div class="row">
-        <div>
+        <div id="countdownSeconds">
           <label for="seconds">開始時間（秒）</label>
           <input id="seconds" type="number" min="0" max="59" value="0" />
         </div>
@@ -466,6 +466,7 @@
     const hours = document.getElementById("hours");
     const minutes = document.getElementById("minutes");
     const seconds = document.getElementById("seconds");
+    const countdownSeconds = document.getElementById("countdownSeconds");
     const fontSize = document.getElementById("fontSize");
     const fontColor = document.getElementById("fontColor");
     const fontColorCode = document.getElementById("fontColorCode");
@@ -474,6 +475,7 @@
     const bgTransparentBtn = document.getElementById("bgTransparentBtn");
     const textOpacity = document.getElementById("textOpacity");
     const textOpacityValue = document.getElementById("textOpacityValue");
+    const countdownOptions = document.getElementById("countdownOptions");
     const pomodoroOptions = document.getElementById("pomodoroOptions");
     const pomodoroWorkMinutes = document.getElementById("pomodoroWorkMinutes");
     const pomodoroBreakMinutes = document.getElementById("pomodoroBreakMinutes");
@@ -700,6 +702,8 @@
 
     function updateModeUI() {
       const showPomodoro = mode.value === "pomodoro";
+      countdownOptions.style.display = showPomodoro ? "none" : "grid";
+      countdownSeconds.style.display = showPomodoro ? "none" : "block";
       pomodoroOptions.style.display = showPomodoro ? "grid" : "none";
     }
 
