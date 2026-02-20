@@ -77,7 +77,7 @@ The interface is fully available in English for international streamers.
 2. Configure your timer  
 3. In OBS:
    - Add **Browser Source**
-   - Set width / height (example: 800×600)
+   - Set width / height (example: 800×200)
    - Load the file or URL  
 
 ---
