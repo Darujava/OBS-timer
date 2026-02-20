@@ -1,0 +1,1214 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OBS Timer HTML Generator</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-start: #1e293b;
+      --panel: #111827;
+      --panel-border: #334155;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-strong: #15803d;
+      --danger: #ef4444;
+      --code-bg: #0b1220;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans JP", sans-serif;
+      background: radial-gradient(circle at top right, var(--bg-start) 0%, var(--bg) 45%);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 24px;
+    }
+
+    .app {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .card {
+      background: linear-gradient(160deg, rgba(17,24,39,0.95), rgba(15,23,42,0.95));
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 18px;
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.25);
+    }
+
+    h1 {
+      font-size: 22px;
+      margin: 0 0 6px;
+    }
+
+    .subtitle {
+      margin: 0 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+
+    input,
+    select,
+    textarea,
+    button {
+      width: 100%;
+      border: 1px solid #334155;
+      border-radius: 8px;
+      background: #0b1220;
+      color: var(--text);
+      padding: 10px 11px;
+      font-size: 14px;
+    }
+
+    textarea {
+      min-height: 360px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      line-height: 1.4;
+      resize: vertical;
+      background: var(--code-bg);
+    }
+
+    button {
+      cursor: pointer;
+      background: #0b1220;
+      transition: 0.15s ease;
+    }
+
+    button:hover {
+      border-color: #64748b;
+    }
+
+    .btn-primary {
+      background: linear-gradient(140deg, var(--accent), var(--accent-strong));
+      border-color: var(--accent);
+      color: #f0fdf4;
+      font-weight: 600;
+    }
+
+    .btn-danger {
+      background: linear-gradient(140deg, #dc2626, #b91c1c);
+      border-color: #dc2626;
+      color: #fef2f2;
+      font-weight: 600;
+    }
+
+    .controls {
+      display: grid;
+      gap: 12px;
+    }
+
+    .buttons {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .hint {
+      font-size: 12px;
+      color: var(--muted);
+      margin: 0;
+      line-height: 1.45;
+    }
+
+    .color-control {
+      display: grid;
+      grid-template-columns: 58px 1fr;
+      gap: 8px;
+    }
+
+    .color-control.with-action {
+      grid-template-columns: 58px 1fr auto;
+    }
+
+    .btn-ghost {
+      background: #0b1220;
+      color: var(--text);
+      border: 1px solid #334155;
+      padding: 8px 10px;
+      white-space: nowrap;
+    }
+
+    .preview-wrap {
+      margin-bottom: 12px;
+    }
+
+    .preview-stage {
+      border: 1px solid #334155;
+      border-radius: 10px;
+      min-height: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: #000;
+    }
+
+    .preview-time {
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .preview-meta {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .preview-buttons {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .pomodoro-options {
+      display: grid;
+      gap: 12px;
+    }
+
+    .header-row {
+      display: flex;
+      align-items: start;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .theme-modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: rgba(2, 6, 23, 0.72);
+      z-index: 1000;
+    }
+
+    .theme-modal.open {
+      display: flex;
+    }
+
+    .theme-panel {
+      width: min(760px, 100%);
+      background: linear-gradient(160deg, rgba(17,24,39,0.98), rgba(15,23,42,0.98));
+      border: 1px solid var(--panel-border);
+      border-radius: 14px;
+      padding: 16px;
+      box-shadow: 0 18px 34px rgba(0, 0, 0, 0.4);
+      display: grid;
+      gap: 12px;
+    }
+
+    .theme-panel-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .theme-panel-head h2 {
+      margin: 0;
+      font-size: 18px;
+    }
+
+    .theme-close {
+      width: auto;
+      padding: 8px 12px;
+    }
+
+    @media (max-width: 900px) {
+      .app {
+        grid-template-columns: 1fr;
+      }
+
+      textarea {
+        min-height: 280px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <section class="card controls">
+      <div class="header-row">
+        <div>
+          <h1>OBS Timer HTML Generator</h1>
+          <p class="subtitle">OBSの「ブラウザ」ソースに貼るためのHTMLを生成します。タイマー（カウントダウン）かストップウォッチ（カウントアップ）を選択できます。</p>
+        </div>
+        <button id="openThemeModal" type="button" class="btn-ghost">テーマ設定</button>
+      </div>
+
+      <div>
+        <label for="mode">モード</label>
+        <select id="mode">
+          <option value="countdown">タイマー（カウントダウン）</option>
+          <option value="stopwatch">ストップウォッチ（カウントアップ）</option>
+          <option value="pomodoro">ポモドーロ</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="hours">開始時間（時）</label>
+          <input id="hours" type="number" min="0" value="0" />
+        </div>
+        <div>
+          <label for="minutes">開始時間（分）</label>
+          <input id="minutes" type="number" min="0" max="59" value="5" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="seconds">開始時間（秒）</label>
+          <input id="seconds" type="number" min="0" max="59" value="0" />
+        </div>
+        <div>
+          <label for="fontSize">文字サイズ（px）</label>
+          <input id="fontSize" type="number" min="12" value="72" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fontColor">文字色</label>
+          <div class="color-control">
+            <input id="fontColor" type="color" value="#ffffff" />
+            <input id="fontColorCode" type="text" value="#ffffff" placeholder="#RRGGBB" />
+          </div>
+        </div>
+        <div>
+          <label for="bgColor">背景色（透明は `transparent`）</label>
+          <div class="color-control with-action">
+            <input id="bgColor" type="color" value="#000000" />
+            <input id="bgColorCode" type="text" value="#000000" placeholder="#RRGGBB または transparent" />
+            <button id="bgTransparentBtn" type="button" class="btn-ghost">背景透過</button>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label for="textOpacity">文字の不透明度（%）</label>
+        <input id="textOpacity" type="range" min="0" max="100" step="1" value="100" />
+        <p id="textOpacityValue" class="hint">100%</p>
+      </div>
+
+      <div id="pomodoroOptions" class="pomodoro-options">
+        <div class="row">
+          <div>
+            <label for="pomodoroWorkMinutes">作業時間（分）</label>
+            <input id="pomodoroWorkMinutes" type="number" min="1" value="25" />
+          </div>
+          <div>
+            <label for="pomodoroBreakMinutes">短休憩（分）</label>
+            <input id="pomodoroBreakMinutes" type="number" min="1" value="5" />
+          </div>
+        </div>
+        <div class="row">
+          <div>
+            <label for="pomodoroLongBreakMinutes">長休憩（分）</label>
+            <input id="pomodoroLongBreakMinutes" type="number" min="1" value="15" />
+          </div>
+          <div>
+            <label for="pomodoroLongBreakEvery">長休憩の間隔（作業回数）</label>
+            <input id="pomodoroLongBreakEvery" type="number" min="2" value="4" />
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fontPreset">フォントプリセット</label>
+          <select id="fontPreset">
+            <option value="system">System Sans（標準）</option>
+            <option value="notoSansJP">Noto Sans JP</option>
+            <option value="zenKaku">Zen Kaku Gothic New</option>
+            <option value="mplus">M PLUS 1p</option>
+            <option value="robotoCondensed">Roboto Condensed</option>
+            <option value="oswald">Oswald</option>
+            <option value="custom">カスタム（下に入力）</option>
+          </select>
+        </div>
+        <div>
+          <label for="fontFamily">カスタムフォント指定</label>
+          <input id="fontFamily" type="text" value="Arial, sans-serif" placeholder="例: 'Helvetica Neue', Arial, sans-serif" />
+        </div>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="blinkOnEnd">終了時に点滅（タイマーのみ）</label>
+          <select id="blinkOnEnd">
+            <option value="true">ON</option>
+            <option value="false">OFF</option>
+          </select>
+        </div>
+        <div>
+          <label for="stopwatchTenths">ストップウォッチで少数第一位を表示</label>
+          <select id="stopwatchTenths">
+            <option value="false">OFF</option>
+            <option value="true">ON</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="buttons">
+        <button id="generate" class="btn-primary">HTMLを生成</button>
+        <button id="copy">コードをコピー</button>
+      </div>
+
+      <div class="row">
+        <div>
+          <label for="fileName">保存ファイル名</label>
+          <input id="fileName" type="text" value="timer.html" placeholder="例: my-timer.html" />
+        </div>
+        <div>
+          <label>&nbsp;</label>
+          <button id="download" class="btn-danger">指定名で保存</button>
+        </div>
+      </div>
+
+      <p class="hint">使い方: 生成されたコードを新規 `timer.html` に保存し、OBSのブラウザソースでローカルファイル指定してください。幅/高さは任意です（例: 800x200）。</p>
+    </section>
+
+    <section class="card">
+      <div class="preview-wrap">
+        <label>ライブプレビュー（文字色/フォント）</label>
+        <div id="previewStage" class="preview-stage">
+          <div id="previewTime" class="preview-time">00:05:00</div>
+        </div>
+        <p id="previewMeta" class="preview-meta">Timer preview</p>
+        <div class="preview-buttons">
+          <button id="previewStart" type="button" class="btn-primary">スタート</button>
+          <button id="previewStop" type="button">ストップ</button>
+          <button id="previewReset" type="button">リセット</button>
+        </div>
+      </div>
+
+      <label for="output">生成されたHTML</label>
+      <textarea id="output" spellcheck="false"></textarea>
+    </section>
+  </div>
+
+  <div id="themeModal" class="theme-modal" aria-hidden="true">
+    <div class="theme-panel">
+      <div class="theme-panel-head">
+        <h2>サイトテーマ設定</h2>
+        <button id="closeThemeModal" type="button" class="theme-close">閉じる</button>
+      </div>
+      <div class="row">
+        <div>
+          <label for="themePreset">サイトテーマ</label>
+          <select id="themePreset">
+            <option value="navy">Navy（現在）</option>
+            <option value="emerald">Emerald</option>
+            <option value="sunset">Sunset</option>
+            <option value="graphite">Graphite</option>
+            <option value="custom">Custom</option>
+          </select>
+        </div>
+        <div>
+          <label for="themeAccent">アクセントカラー</label>
+          <input id="themeAccent" type="color" value="#22c55e" />
+        </div>
+      </div>
+      <div class="row">
+        <div>
+          <label for="themeBgStart">背景色（開始）</label>
+          <input id="themeBgStart" type="color" value="#1e293b" />
+        </div>
+        <div>
+          <label for="themeBgEnd">背景色（終了）</label>
+          <input id="themeBgEnd" type="color" value="#0f172a" />
+        </div>
+      </div>
+      <p class="hint">テーマは設定ページ全体の見た目にのみ適用されます（生成される timer.html の見た目には影響しません）。</p>
+    </div>
+  </div>
+
+  <script>
+    const themeModal = document.getElementById("themeModal");
+    const openThemeModal = document.getElementById("openThemeModal");
+    const closeThemeModal = document.getElementById("closeThemeModal");
+    const mode = document.getElementById("mode");
+    const themePreset = document.getElementById("themePreset");
+    const themeAccent = document.getElementById("themeAccent");
+    const themeBgStart = document.getElementById("themeBgStart");
+    const themeBgEnd = document.getElementById("themeBgEnd");
+    const hours = document.getElementById("hours");
+    const minutes = document.getElementById("minutes");
+    const seconds = document.getElementById("seconds");
+    const fontSize = document.getElementById("fontSize");
+    const fontColor = document.getElementById("fontColor");
+    const fontColorCode = document.getElementById("fontColorCode");
+    const bgColor = document.getElementById("bgColor");
+    const bgColorCode = document.getElementById("bgColorCode");
+    const bgTransparentBtn = document.getElementById("bgTransparentBtn");
+    const textOpacity = document.getElementById("textOpacity");
+    const textOpacityValue = document.getElementById("textOpacityValue");
+    const pomodoroOptions = document.getElementById("pomodoroOptions");
+    const pomodoroWorkMinutes = document.getElementById("pomodoroWorkMinutes");
+    const pomodoroBreakMinutes = document.getElementById("pomodoroBreakMinutes");
+    const pomodoroLongBreakMinutes = document.getElementById("pomodoroLongBreakMinutes");
+    const pomodoroLongBreakEvery = document.getElementById("pomodoroLongBreakEvery");
+    const fontPreset = document.getElementById("fontPreset");
+    const fontFamily = document.getElementById("fontFamily");
+    const blinkOnEnd = document.getElementById("blinkOnEnd");
+    const stopwatchTenths = document.getElementById("stopwatchTenths");
+    const fileName = document.getElementById("fileName");
+    const output = document.getElementById("output");
+    const previewStage = document.getElementById("previewStage");
+    const previewTime = document.getElementById("previewTime");
+    const previewMeta = document.getElementById("previewMeta");
+    const previewStart = document.getElementById("previewStart");
+    const previewStop = document.getElementById("previewStop");
+    const previewReset = document.getElementById("previewReset");
+
+    const generateButton = document.getElementById("generate");
+    const copyButton = document.getElementById("copy");
+    const downloadButton = document.getElementById("download");
+    let previewRunning = false;
+    let previewElapsedMs = 0;
+    let previewRemaining = 0;
+    let previewPomodoroPhase = "work";
+    let previewPomodoroWorkCount = 0;
+    let previewPomodoroRemaining = 0;
+    let previewSecondAccumulatorMs = 0;
+    let previewCountdownAccumulatorMs = 0;
+    let previewPomodoroAccumulatorMs = 0;
+
+    const FONT_PRESETS = {
+      system: {
+        cssFamily: "Arial, sans-serif",
+        importUrl: ""
+      },
+      notoSansJP: {
+        cssFamily: "'Noto Sans JP', sans-serif",
+        importUrl: "https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap"
+      },
+      zenKaku: {
+        cssFamily: "'Zen Kaku Gothic New', sans-serif",
+        importUrl: "https://fonts.googleapis.com/css2?family=Zen+Kaku+Gothic+New:wght@400;700&display=swap"
+      },
+      mplus: {
+        cssFamily: "'M PLUS 1p', sans-serif",
+        importUrl: "https://fonts.googleapis.com/css2?family=M+PLUS+1p:wght@400;700&display=swap"
+      },
+      robotoCondensed: {
+        cssFamily: "'Roboto Condensed', sans-serif",
+        importUrl: "https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&display=swap"
+      },
+      oswald: {
+        cssFamily: "'Oswald', sans-serif",
+        importUrl: "https://fonts.googleapis.com/css2?family=Oswald:wght@400;700&display=swap"
+      }
+    };
+
+    const THEME_PRESETS = {
+      navy: {
+        bgStart: "#1e293b",
+        bgEnd: "#0f172a",
+        accent: "#22c55e"
+      },
+      emerald: {
+        bgStart: "#064e3b",
+        bgEnd: "#022c22",
+        accent: "#34d399"
+      },
+      sunset: {
+        bgStart: "#7c2d12",
+        bgEnd: "#3b0764",
+        accent: "#f97316"
+      },
+      graphite: {
+        bgStart: "#374151",
+        bgEnd: "#111827",
+        accent: "#06b6d4"
+      }
+    };
+
+    function esc(value) {
+      return String(value)
+        .replaceAll("\\", "\\\\")
+        .replaceAll("`", "\\`")
+        .replaceAll("${", "\\${");
+    }
+
+    function escAttr(value) {
+      return String(value)
+        .replaceAll("&", "&amp;")
+        .replaceAll("\"", "&quot;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+    }
+
+    function numberOrZero(value) {
+      const n = Number(value);
+      return Number.isFinite(n) && n >= 0 ? Math.floor(n) : 0;
+    }
+
+    function normalizeHex(value) {
+      const raw = String(value || "").trim().toLowerCase();
+      const clean = raw.startsWith("#") ? raw.slice(1) : raw;
+      if (/^[0-9a-f]{6}$/.test(clean)) {
+        return `#${clean}`;
+      }
+      if (/^[0-9a-f]{3}$/.test(clean)) {
+        return `#${clean[0]}${clean[0]}${clean[1]}${clean[1]}${clean[2]}${clean[2]}`;
+      }
+      return "";
+    }
+
+    function isTransparent(value) {
+      return String(value || "").trim().toLowerCase() === "transparent";
+    }
+
+    function formatDisplay(total) {
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return `${String(h).padStart(2, "0")}:${String(m).padStart(2, "0")}:${String(s).padStart(2, "0")}`;
+    }
+
+    function formatStopwatchMs(totalMs, showTenths) {
+      const safeMs = Math.max(0, totalMs);
+      const wholeSeconds = Math.floor(safeMs / 1000);
+      const base = formatDisplay(wholeSeconds);
+      if (!showTenths) {
+        return base;
+      }
+      const tenths = Math.floor((safeMs % 1000) / 100);
+      return `${base}.${tenths}`;
+    }
+
+    function darkenHex(hex, factor) {
+      const normalized = normalizeHex(hex);
+      if (!normalized) {
+        return "#15803d";
+      }
+      const n = normalized.slice(1);
+      const r = Math.max(0, Math.min(255, Math.floor(parseInt(n.slice(0, 2), 16) * (1 - factor))));
+      const g = Math.max(0, Math.min(255, Math.floor(parseInt(n.slice(2, 4), 16) * (1 - factor))));
+      const b = Math.max(0, Math.min(255, Math.floor(parseInt(n.slice(4, 6), 16) * (1 - factor))));
+      return `#${r.toString(16).padStart(2, "0")}${g.toString(16).padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
+    }
+
+    function applySiteTheme(theme) {
+      const root = document.documentElement;
+      root.style.setProperty("--bg-start", theme.bgStart);
+      root.style.setProperty("--bg", theme.bgEnd);
+      root.style.setProperty("--accent", theme.accent);
+      root.style.setProperty("--accent-strong", darkenHex(theme.accent, 0.28));
+    }
+
+    function updateThemeUI() {
+      const custom = themePreset.value === "custom";
+      if (!custom) {
+        const preset = THEME_PRESETS[themePreset.value] || THEME_PRESETS.navy;
+        themeBgStart.value = preset.bgStart;
+        themeBgEnd.value = preset.bgEnd;
+        themeAccent.value = preset.accent;
+      }
+      themeBgStart.disabled = !custom;
+      themeBgEnd.disabled = !custom;
+      themeAccent.disabled = !custom;
+      applySiteTheme({
+        bgStart: normalizeHex(themeBgStart.value) || "#1e293b",
+        bgEnd: normalizeHex(themeBgEnd.value) || "#0f172a",
+        accent: normalizeHex(themeAccent.value) || "#22c55e"
+      });
+    }
+
+    function setThemeModalOpen(open) {
+      themeModal.classList.toggle("open", open);
+      themeModal.setAttribute("aria-hidden", open ? "false" : "true");
+    }
+
+    function getFontConfig() {
+      if (fontPreset.value === "custom") {
+        return {
+          cssFamily: fontFamily.value.trim() || "Arial, sans-serif",
+          importUrl: ""
+        };
+      }
+      return FONT_PRESETS[fontPreset.value] || FONT_PRESETS.system;
+    }
+
+    function getConfig() {
+      const h = numberOrZero(hours.value);
+      const m = numberOrZero(minutes.value);
+      const s = numberOrZero(seconds.value);
+      const size = Math.max(12, numberOrZero(fontSize.value));
+      const totalSeconds = h * 3600 + m * 60 + s;
+      const opacityPercent = Math.min(100, numberOrZero(textOpacity.value));
+      const fontHex = normalizeHex(fontColorCode.value) || fontColor.value;
+      const bgRaw = bgColorCode.value.trim();
+      const transparentBg = isTransparent(bgRaw);
+      const bgHex = normalizeHex(bgRaw) || bgColor.value;
+      const workMin = Math.max(1, numberOrZero(pomodoroWorkMinutes.value));
+      const breakMin = Math.max(1, numberOrZero(pomodoroBreakMinutes.value));
+      const longBreakMin = Math.max(1, numberOrZero(pomodoroLongBreakMinutes.value));
+      const longBreakEvery = Math.max(2, numberOrZero(pomodoroLongBreakEvery.value));
+      const selectedFont = getFontConfig();
+
+      return {
+        mode: mode.value,
+        totalSeconds,
+        pomodoroWorkSeconds: workMin * 60,
+        pomodoroBreakSeconds: breakMin * 60,
+        pomodoroLongBreakSeconds: longBreakMin * 60,
+        pomodoroLongBreakEvery: longBreakEvery,
+        fontSize: size,
+        fontColor: fontHex,
+        textOpacity: opacityPercent / 100,
+        textOpacityPercent: opacityPercent,
+        bgColor: transparentBg ? "transparent" : bgHex,
+        fontFamily: selectedFont.cssFamily,
+        fontImportUrl: selectedFont.importUrl,
+        blinkOnEnd: blinkOnEnd.value === "true",
+        stopwatchShowTenths: stopwatchTenths.value === "true"
+      };
+    }
+
+    function updateModeUI() {
+      const showPomodoro = mode.value === "pomodoro";
+      pomodoroOptions.style.display = showPomodoro ? "grid" : "none";
+    }
+
+    function getPreviewPhaseLabel() {
+      return previewPomodoroPhase === "work"
+        ? "WORK"
+        : previewPomodoroPhase === "shortBreak"
+          ? "BREAK"
+          : "LONG BREAK";
+    }
+
+    function getPreviewSetLabel(config) {
+      const cycle = Math.max(2, config.pomodoroLongBreakEvery);
+      if (previewPomodoroPhase === "work") {
+        return `Set ${(previewPomodoroWorkCount % cycle) + 1}/${cycle}`;
+      }
+      const completedInCycle = previewPomodoroWorkCount % cycle;
+      const setNumber = completedInCycle === 0 ? cycle : completedInCycle;
+      return `Set ${setNumber}/${cycle}`;
+    }
+
+    function renderPreviewTimer(config) {
+      if (config.mode === "countdown") {
+        previewTime.textContent = formatDisplay(previewRemaining);
+        previewMeta.textContent = previewRunning ? "Timer: Running" : "Timer: Paused";
+        return;
+      }
+      if (config.mode === "pomodoro") {
+        previewTime.textContent = formatDisplay(previewPomodoroRemaining);
+        previewMeta.textContent = `Pomodoro: ${getPreviewPhaseLabel()} | ${getPreviewSetLabel(config)} (${previewRunning ? "Running" : "Paused"})`;
+        return;
+      }
+      previewTime.textContent = formatStopwatchMs(previewElapsedMs, config.stopwatchShowTenths);
+      previewMeta.textContent = previewRunning ? "Stopwatch: Running" : "Stopwatch: Paused";
+    }
+
+    function resetPreviewState() {
+      const config = getConfig();
+      previewRunning = false;
+      previewElapsedMs = 0;
+      previewRemaining = config.totalSeconds;
+      previewPomodoroPhase = "work";
+      previewPomodoroWorkCount = 0;
+      previewPomodoroRemaining = config.pomodoroWorkSeconds;
+      previewSecondAccumulatorMs = 0;
+      previewCountdownAccumulatorMs = 0;
+      previewPomodoroAccumulatorMs = 0;
+      renderPreviewTimer(config);
+    }
+
+    function nextPreviewPomodoroPhase(config) {
+      if (previewPomodoroPhase === "work") {
+        previewPomodoroWorkCount += 1;
+        if (previewPomodoroWorkCount % config.pomodoroLongBreakEvery === 0) {
+          previewPomodoroPhase = "longBreak";
+          previewPomodoroRemaining = config.pomodoroLongBreakSeconds;
+        } else {
+          previewPomodoroPhase = "shortBreak";
+          previewPomodoroRemaining = config.pomodoroBreakSeconds;
+        }
+      } else {
+        previewPomodoroPhase = "work";
+        previewPomodoroRemaining = config.pomodoroWorkSeconds;
+      }
+    }
+
+    function previewTick() {
+      if (!previewRunning) {
+        return;
+      }
+      const config = getConfig();
+      if (config.mode === "countdown") {
+        previewCountdownAccumulatorMs += 100;
+        while (previewCountdownAccumulatorMs >= 1000 && previewRemaining > 0) {
+          previewCountdownAccumulatorMs -= 1000;
+          previewRemaining -= 1;
+        }
+        if (previewRemaining === 0) {
+          previewRunning = false;
+        }
+        renderPreviewTimer(config);
+        return;
+      }
+      if (config.mode === "pomodoro") {
+        previewPomodoroAccumulatorMs += 100;
+        while (previewPomodoroAccumulatorMs >= 1000 && previewPomodoroRemaining > 0) {
+          previewPomodoroAccumulatorMs -= 1000;
+          previewPomodoroRemaining -= 1;
+        }
+        if (previewPomodoroRemaining === 0) {
+          nextPreviewPomodoroPhase(config);
+        }
+        renderPreviewTimer(config);
+        return;
+      }
+      if (config.stopwatchShowTenths) {
+        previewElapsedMs += 100;
+      } else {
+        previewSecondAccumulatorMs += 100;
+        while (previewSecondAccumulatorMs >= 1000) {
+          previewSecondAccumulatorMs -= 1000;
+          previewElapsedMs += 1000;
+        }
+      }
+      renderPreviewTimer(config);
+    }
+
+    function startPreview() {
+      const config = getConfig();
+      if (config.mode === "countdown" && previewRemaining === 0) {
+        return;
+      }
+      previewRunning = true;
+      renderPreviewTimer(config);
+    }
+
+    function stopPreview() {
+      previewRunning = false;
+      renderPreviewTimer(getConfig());
+    }
+
+    function updateFontUI() {
+      const custom = fontPreset.value === "custom";
+      fontFamily.disabled = !custom;
+      if (!custom) {
+        fontFamily.value = getFontConfig().cssFamily;
+      }
+    }
+
+    function ensurePreviewFontLoaded(importUrl) {
+      const linkId = "preview-font-import";
+      const current = document.getElementById(linkId);
+      if (!importUrl) {
+        if (current) {
+          current.remove();
+        }
+        return;
+      }
+      if (current && current.getAttribute("href") === importUrl) {
+        return;
+      }
+      if (current) {
+        current.remove();
+      }
+      const link = document.createElement("link");
+      link.id = linkId;
+      link.rel = "stylesheet";
+      link.href = importUrl;
+      document.head.appendChild(link);
+    }
+
+    function syncColorCodeFromPicker(picker, codeInput) {
+      codeInput.value = picker.value;
+    }
+
+    function syncPickerFromColorCode(codeInput, picker) {
+      const hex = normalizeHex(codeInput.value);
+      if (hex) {
+        picker.value = hex;
+      }
+    }
+
+    function updatePreview() {
+      const config = getConfig();
+      ensurePreviewFontLoaded(config.fontImportUrl);
+      if (config.bgColor === "transparent") {
+        previewStage.style.backgroundColor = "transparent";
+        previewStage.style.backgroundImage = "linear-gradient(45deg, #1f2937 25%, transparent 25%, transparent 75%, #1f2937 75%), linear-gradient(45deg, #1f2937 25%, transparent 25%, transparent 75%, #1f2937 75%)";
+        previewStage.style.backgroundSize = "16px 16px";
+        previewStage.style.backgroundPosition = "0 0, 8px 8px";
+      } else {
+        previewStage.style.background = config.bgColor;
+        previewStage.style.backgroundImage = "none";
+      }
+      previewTime.style.color = config.fontColor;
+      previewTime.style.opacity = String(config.textOpacity);
+      previewTime.style.fontFamily = config.fontFamily;
+      previewTime.style.fontSize = `${Math.max(18, config.fontSize)}px`;
+      textOpacityValue.textContent = `${config.textOpacityPercent}%`;
+      renderPreviewTimer(config);
+    }
+
+    function buildHtml() {
+      const config = getConfig();
+
+      return `<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  ${config.fontImportUrl ? `<link rel="stylesheet" href="${escAttr(config.fontImportUrl)}" />` : ""}
+  <title>OBS Timer</title>
+  <style>
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: ${esc(config.bgColor)};
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+    }
+
+    #time {
+      color: ${esc(config.fontColor)};
+      opacity: ${config.textOpacity};
+      font-size: ${config.fontSize}px;
+      font-family: ${esc(config.fontFamily)};
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    #state {
+      color: ${esc(config.fontColor)};
+      opacity: ${Math.min(1, config.textOpacity + 0.15)};
+      font-size: ${Math.max(16, Math.floor(config.fontSize * 0.3))}px;
+      font-family: ${esc(config.fontFamily)};
+      letter-spacing: 0.2em;
+      font-weight: 700;
+      min-height: 1.2em;
+      user-select: none;
+    }
+
+    .blink {
+      animation: blink 1s step-end infinite;
+    }
+
+    @keyframes blink {
+      50% { opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div id="state"></div>
+  <div id="time">00:00:00</div>
+
+  <script>
+    const MODE = "${esc(config.mode)}";
+    const BLINK_ON_END = ${config.blinkOnEnd};
+    const STOPWATCH_SHOW_TENTHS = ${config.stopwatchShowTenths};
+    const INITIAL_SECONDS = ${config.totalSeconds};
+    const POMODORO_WORK_SECONDS = ${config.pomodoroWorkSeconds};
+    const POMODORO_BREAK_SECONDS = ${config.pomodoroBreakSeconds};
+    const POMODORO_LONG_BREAK_SECONDS = ${config.pomodoroLongBreakSeconds};
+    const POMODORO_LONG_BREAK_EVERY = ${config.pomodoroLongBreakEvery};
+
+    const timeEl = document.getElementById("time");
+    const stateEl = document.getElementById("state");
+    let elapsedMs = 0;
+    let remaining = INITIAL_SECONDS;
+    let pomodoroWorkCount = 0;
+    let pomodoroPhase = "work";
+    let pomodoroRemaining = POMODORO_WORK_SECONDS;
+
+    function pad(value) {
+      return String(value).padStart(2, "0");
+    }
+
+    function formatSeconds(total) {
+      const h = Math.floor(total / 3600);
+      const m = Math.floor((total % 3600) / 60);
+      const s = total % 60;
+      return \`${"${pad(h)}:${pad(m)}:${pad(s)}"}\`;
+    }
+
+    function formatStopwatch(totalMs) {
+      const totalSeconds = Math.floor(totalMs / 1000);
+      const base = formatSeconds(totalSeconds);
+      if (!STOPWATCH_SHOW_TENTHS) {
+        return base;
+      }
+      const tenths = Math.floor((totalMs % 1000) / 100);
+      return \`${"${base}.${tenths}"}\`;
+    }
+
+    function renderSeconds(value) {
+      timeEl.textContent = formatSeconds(value);
+    }
+
+    function renderStopwatch() {
+      timeEl.textContent = formatStopwatch(elapsedMs);
+    }
+
+    function updatePomodoroStateLabel() {
+      if (MODE !== "pomodoro") {
+        stateEl.textContent = "";
+        return;
+      }
+      const cycle = Math.max(2, POMODORO_LONG_BREAK_EVERY);
+      const setText = (() => {
+        if (pomodoroPhase === "work") {
+          return String((pomodoroWorkCount % cycle) + 1) + "/" + String(cycle);
+        }
+        const completedInCycle = pomodoroWorkCount % cycle;
+        const setNumber = completedInCycle === 0 ? cycle : completedInCycle;
+        return String(setNumber) + "/" + String(cycle);
+      })();
+      stateEl.textContent =
+        pomodoroPhase === "work"
+          ? "WORK  SET " + setText
+          : pomodoroPhase === "shortBreak"
+            ? "BREAK  SET " + setText
+            : "LONG BREAK  SET " + setText;
+    }
+
+    function nextPomodoroPhase() {
+      if (pomodoroPhase === "work") {
+        pomodoroWorkCount += 1;
+        if (pomodoroWorkCount % POMODORO_LONG_BREAK_EVERY === 0) {
+          pomodoroPhase = "longBreak";
+          pomodoroRemaining = POMODORO_LONG_BREAK_SECONDS;
+        } else {
+          pomodoroPhase = "shortBreak";
+          pomodoroRemaining = POMODORO_BREAK_SECONDS;
+        }
+      } else {
+        pomodoroPhase = "work";
+        pomodoroRemaining = POMODORO_WORK_SECONDS;
+      }
+      updatePomodoroStateLabel();
+      renderSeconds(pomodoroRemaining);
+    }
+
+    function tick() {
+      if (MODE === "pomodoro") {
+        if (pomodoroRemaining > 0) {
+          pomodoroRemaining -= 1;
+          renderSeconds(pomodoroRemaining);
+          if (pomodoroRemaining === 0) {
+            nextPomodoroPhase();
+          }
+        }
+        return;
+      }
+
+      if (MODE === "countdown") {
+        if (remaining > 0) {
+          remaining -= 1;
+          renderSeconds(remaining);
+          if (remaining === 0 && BLINK_ON_END) {
+            timeEl.classList.add("blink");
+          }
+        }
+        return;
+      }
+
+      if (STOPWATCH_SHOW_TENTHS) {
+        elapsedMs += 100;
+      } else {
+        elapsedMs += 1000;
+      }
+      renderStopwatch();
+    }
+
+    if (MODE === "countdown") {
+      renderSeconds(remaining);
+      if (remaining === 0 && BLINK_ON_END) {
+        timeEl.classList.add("blink");
+      }
+    } else if (MODE === "pomodoro") {
+      updatePomodoroStateLabel();
+      renderSeconds(pomodoroRemaining);
+    } else {
+      renderStopwatch();
+      stateEl.textContent = "";
+    }
+
+    const intervalMs = MODE === "stopwatch" && STOPWATCH_SHOW_TENTHS ? 100 : 1000;
+    setInterval(tick, intervalMs);
+  <\/script>
+</body>
+</html>`;
+    }
+
+    function generate() {
+      output.value = buildHtml();
+    }
+
+    async function copyCode() {
+      if (!output.value) {
+        generate();
+      }
+
+      try {
+        await navigator.clipboard.writeText(output.value);
+        copyButton.textContent = "コピーしました";
+      } catch (_) {
+        copyButton.textContent = "コピー失敗";
+      }
+
+      setTimeout(() => {
+        copyButton.textContent = "コードをコピー";
+      }, 1400);
+    }
+
+    function downloadFile() {
+      if (!output.value) {
+        generate();
+      }
+
+      const rawName = (fileName.value || "").trim();
+      const safeBase = rawName
+        .replace(/[\\/:*?"<>|]/g, "_")
+        .replace(/\s+/g, " ")
+        .trim();
+      const finalName = safeBase
+        ? (safeBase.toLowerCase().endsWith(".html") ? safeBase : `${safeBase}.html`)
+        : "timer.html";
+
+      const blob = new Blob([output.value], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = finalName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    }
+
+    generateButton.addEventListener("click", generate);
+    copyButton.addEventListener("click", copyCode);
+    downloadButton.addEventListener("click", downloadFile);
+    previewStart.addEventListener("click", startPreview);
+    previewStop.addEventListener("click", stopPreview);
+    previewReset.addEventListener("click", resetPreviewState);
+    openThemeModal.addEventListener("click", () => setThemeModalOpen(true));
+    closeThemeModal.addEventListener("click", () => setThemeModalOpen(false));
+    themeModal.addEventListener("click", (event) => {
+      if (event.target === themeModal) {
+        setThemeModalOpen(false);
+      }
+    });
+    themePreset.addEventListener("change", updateThemeUI);
+    [themeAccent, themeBgStart, themeBgEnd].forEach((el) => {
+      el.addEventListener("input", updateThemeUI);
+      el.addEventListener("change", updateThemeUI);
+    });
+    mode.addEventListener("change", () => {
+      updateModeUI();
+      resetPreviewState();
+      updatePreview();
+    });
+    fontPreset.addEventListener("change", () => {
+      updateFontUI();
+      updatePreview();
+    });
+    fontColor.addEventListener("input", () => {
+      syncColorCodeFromPicker(fontColor, fontColorCode);
+      updatePreview();
+    });
+    bgColor.addEventListener("input", () => {
+      syncColorCodeFromPicker(bgColor, bgColorCode);
+      updatePreview();
+    });
+    fontColorCode.addEventListener("input", () => {
+      syncPickerFromColorCode(fontColorCode, fontColor);
+      updatePreview();
+    });
+    bgColorCode.addEventListener("input", () => {
+      if (!isTransparent(bgColorCode.value)) {
+        syncPickerFromColorCode(bgColorCode, bgColor);
+      }
+      updatePreview();
+    });
+    bgTransparentBtn.addEventListener("click", () => {
+      bgColorCode.value = "transparent";
+      updatePreview();
+    });
+    [
+      hours,
+      minutes,
+      seconds,
+      pomodoroWorkMinutes,
+      pomodoroBreakMinutes,
+      pomodoroLongBreakMinutes,
+      pomodoroLongBreakEvery,
+      blinkOnEnd
+    ].forEach((el) => {
+      el.addEventListener("input", resetPreviewState);
+      el.addEventListener("change", resetPreviewState);
+    });
+    [
+      fontSize,
+      textOpacity,
+      fontFamily,
+      stopwatchTenths
+    ].forEach((el) => {
+      el.addEventListener("input", updatePreview);
+      el.addEventListener("change", updatePreview);
+    });
+
+    updateThemeUI();
+    setThemeModalOpen(false);
+    updateModeUI();
+    updateFontUI();
+    resetPreviewState();
+    updatePreview();
+    setInterval(previewTick, 100);
+    generate();
+  </script>
+</body>
+</html>
