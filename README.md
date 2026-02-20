@@ -1,7 +1,7 @@
 # OBS Timer HTML Generator
 
 <p align="center">
-  <a href="https://darujava.github.io/OBS-timer/">
+  <a href="https://darujava.github.io/OBS-timerKit/">
     <img src="https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge">
   </a>
   <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
@@ -22,7 +22,7 @@ Create customizable, ready-to-use HTML timer overlays for:
 
 ## 🚀 Live Demo
 
-👉 **https://darujava.github.io/OBS-timer/**
+👉 **https://darujava.github.io/OBS-timerKit/**
 
 Launch the generator directly in your browser — no installation required.
 
