@@ -1,6 +1,6 @@
 # OBS Timer HTML Generator
 
-![OBS Timer Screenshot](screenshot.png)
+![OBS Timer Screenshot](Screenshot.png)
 
 A web-based generator for creating customizable HTML timers for streaming.
 
