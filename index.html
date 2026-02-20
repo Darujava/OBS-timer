@@ -201,6 +201,17 @@
       gap: 12px;
     }
 
+    .header-actions {
+      display: grid;
+      gap: 8px;
+      width: min(240px, 100%);
+    }
+
+    .lang-switch {
+      display: grid;
+      gap: 6px;
+    }
+
     .theme-modal {
       position: fixed;
       inset: 0;
@@ -260,14 +271,23 @@
     <section class="card controls">
       <div class="header-row">
         <div>
-          <h1>OBS Timer HTML Generator</h1>
-          <p class="subtitle">OBSの「ブラウザ」ソースに貼るためのHTMLを生成します。タイマー（カウントダウン）かストップウォッチ（カウントアップ）を選択できます。</p>
+          <h1 id="appTitle">OBS Timer HTML Generator</h1>
+          <p id="appSubtitle" class="subtitle">OBSの「ブラウザ」ソースに貼るためのHTMLを生成します。タイマー（カウントダウン）かストップウォッチ（カウントアップ）を選択できます。</p>
         </div>
-        <button id="openThemeModal" type="button" class="btn-ghost">テーマ設定</button>
+        <div class="header-actions">
+          <div class="lang-switch">
+            <label id="languageLabel" for="language">言語</label>
+            <select id="language">
+              <option value="ja">日本語</option>
+              <option value="en">English</option>
+            </select>
+          </div>
+          <button id="openThemeModal" type="button" class="btn-ghost">テーマ設定</button>
+        </div>
       </div>
 
       <div>
-        <label for="mode">モード</label>
+        <label id="modeLabel" for="mode">モード</label>
         <select id="mode">
           <option value="countdown">タイマー（カウントダウン）</option>
           <option value="stopwatch">ストップウォッチ（カウントアップ）</option>
@@ -277,36 +297,36 @@
 
       <div id="countdownOptions" class="row">
         <div>
-          <label for="hours">開始時間（時）</label>
+          <label id="hoursLabel" for="hours">開始時間（時）</label>
           <input id="hours" type="number" min="0" value="0" />
         </div>
         <div>
-          <label for="minutes">開始時間（分）</label>
+          <label id="minutesLabel" for="minutes">開始時間（分）</label>
           <input id="minutes" type="number" min="0" max="59" value="5" />
         </div>
       </div>
 
       <div class="row">
         <div id="countdownSeconds">
-          <label for="seconds">開始時間（秒）</label>
+          <label id="secondsLabel" for="seconds">開始時間（秒）</label>
           <input id="seconds" type="number" min="0" max="59" value="0" />
         </div>
         <div>
-          <label for="fontSize">文字サイズ（px）</label>
+          <label id="fontSizeLabel" for="fontSize">文字サイズ（px）</label>
           <input id="fontSize" type="number" min="12" value="72" />
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label for="fontColor">文字色</label>
+          <label id="fontColorLabel" for="fontColor">文字色</label>
           <div class="color-control">
             <input id="fontColor" type="color" value="#ffffff" />
             <input id="fontColorCode" type="text" value="#ffffff" placeholder="#RRGGBB" />
           </div>
         </div>
         <div>
-          <label for="bgColor">背景色（透明は `transparent`）</label>
+          <label id="bgColorLabel" for="bgColor">背景色（透明は `transparent`）</label>
           <div class="color-control with-action">
             <input id="bgColor" type="color" value="#000000" />
             <input id="bgColorCode" type="text" value="#000000" placeholder="#RRGGBB または transparent" />
@@ -316,7 +336,7 @@
       </div>
 
       <div>
-        <label for="textOpacity">文字の不透明度（%）</label>
+        <label id="textOpacityLabel" for="textOpacity">文字の不透明度（%）</label>
         <input id="textOpacity" type="range" min="0" max="100" step="1" value="100" />
         <p id="textOpacityValue" class="hint">100%</p>
       </div>
@@ -324,21 +344,21 @@
       <div id="pomodoroOptions" class="pomodoro-options">
         <div class="row">
           <div>
-            <label for="pomodoroWorkMinutes">作業時間（分）</label>
+            <label id="pomodoroWorkLabel" for="pomodoroWorkMinutes">作業時間（分）</label>
             <input id="pomodoroWorkMinutes" type="number" min="1" value="25" />
           </div>
           <div>
-            <label for="pomodoroBreakMinutes">短休憩（分）</label>
+            <label id="pomodoroBreakLabel" for="pomodoroBreakMinutes">短休憩（分）</label>
             <input id="pomodoroBreakMinutes" type="number" min="1" value="5" />
           </div>
         </div>
         <div class="row">
           <div>
-            <label for="pomodoroLongBreakMinutes">長休憩（分）</label>
+            <label id="pomodoroLongBreakLabel" for="pomodoroLongBreakMinutes">長休憩（分）</label>
             <input id="pomodoroLongBreakMinutes" type="number" min="1" value="15" />
           </div>
           <div>
-            <label for="pomodoroLongBreakEvery">長休憩の間隔（作業回数）</label>
+            <label id="pomodoroLongEveryLabel" for="pomodoroLongBreakEvery">長休憩の間隔（作業回数）</label>
             <input id="pomodoroLongBreakEvery" type="number" min="2" value="4" />
           </div>
         </div>
@@ -346,7 +366,7 @@
 
       <div class="row">
         <div>
-          <label for="fontPreset">フォントプリセット</label>
+          <label id="fontPresetLabel" for="fontPreset">フォントプリセット</label>
           <select id="fontPreset">
             <option value="system">System Sans（標準）</option>
             <option value="notoSansJP">Noto Sans JP</option>
@@ -358,21 +378,21 @@
           </select>
         </div>
         <div>
-          <label for="fontFamily">カスタムフォント指定</label>
+          <label id="fontFamilyLabel" for="fontFamily">カスタムフォント指定</label>
           <input id="fontFamily" type="text" value="Arial, sans-serif" placeholder="例: 'Helvetica Neue', Arial, sans-serif" />
         </div>
       </div>
 
       <div class="row">
         <div>
-          <label for="blinkOnEnd">終了時に点滅（タイマーのみ）</label>
+          <label id="blinkOnEndLabel" for="blinkOnEnd">終了時に点滅（タイマーのみ）</label>
           <select id="blinkOnEnd">
             <option value="true">ON</option>
             <option value="false">OFF</option>
           </select>
         </div>
         <div>
-          <label for="stopwatchTenths">ストップウォッチで少数第一位を表示</label>
+          <label id="stopwatchTenthsLabel" for="stopwatchTenths">ストップウォッチで少数第一位を表示</label>
           <select id="stopwatchTenths">
             <option value="false">OFF</option>
             <option value="true">ON</option>
@@ -387,7 +407,7 @@
 
       <div class="row">
         <div>
-          <label for="fileName">保存ファイル名</label>
+          <label id="fileNameLabel" for="fileName">保存ファイル名</label>
           <input id="fileName" type="text" value="timer.html" placeholder="例: my-timer.html" />
         </div>
         <div>
@@ -396,12 +416,12 @@
         </div>
       </div>
 
-      <p class="hint">使い方: 生成されたコードを新規 `timer.html` に保存し、OBSのブラウザソースでローカルファイル指定してください。幅/高さは任意です（例: 800x200）。</p>
+      <p id="usageHint" class="hint">使い方: 生成されたコードを新規 `timer.html` に保存し、OBSのブラウザソースでローカルファイル指定してください。幅/高さは任意です（例: 800x200）。</p>
     </section>
 
     <section class="card">
       <div class="preview-wrap">
-        <label>ライブプレビュー（文字色/フォント）</label>
+        <label id="previewLabel">ライブプレビュー（文字色/フォント）</label>
         <div id="previewStage" class="preview-stage">
           <div id="previewTime" class="preview-time">00:05:00</div>
         </div>
@@ -413,7 +433,7 @@
         </div>
       </div>
 
-      <label for="output">生成されたHTML</label>
+      <label id="outputLabel" for="output">生成されたHTML</label>
       <textarea id="output" spellcheck="false"></textarea>
     </section>
   </div>
@@ -421,12 +441,12 @@
   <div id="themeModal" class="theme-modal" aria-hidden="true">
     <div class="theme-panel">
       <div class="theme-panel-head">
-        <h2>サイトテーマ設定</h2>
+        <h2 id="themeModalTitle">サイトテーマ設定</h2>
         <button id="closeThemeModal" type="button" class="theme-close">閉じる</button>
       </div>
       <div class="row">
         <div>
-          <label for="themePreset">サイトテーマ</label>
+          <label id="themePresetLabel" for="themePreset">サイトテーマ</label>
           <select id="themePreset">
             <option value="navy">Navy（現在）</option>
             <option value="emerald">Emerald</option>
@@ -436,21 +456,21 @@
           </select>
         </div>
         <div>
-          <label for="themeAccent">アクセントカラー</label>
+          <label id="themeAccentLabel" for="themeAccent">アクセントカラー</label>
           <input id="themeAccent" type="color" value="#22c55e" />
         </div>
       </div>
       <div class="row">
         <div>
-          <label for="themeBgStart">背景色（開始）</label>
+          <label id="themeBgStartLabel" for="themeBgStart">背景色（開始）</label>
           <input id="themeBgStart" type="color" value="#1e293b" />
         </div>
         <div>
-          <label for="themeBgEnd">背景色（終了）</label>
+          <label id="themeBgEndLabel" for="themeBgEnd">背景色（終了）</label>
           <input id="themeBgEnd" type="color" value="#0f172a" />
         </div>
       </div>
-      <p class="hint">テーマは設定ページ全体の見た目にのみ適用されます（生成される timer.html の見た目には影響しません）。</p>
+      <p id="themeHint" class="hint">テーマは設定ページ全体の見た目にのみ適用されます（生成される timer.html の見た目には影響しません）。</p>
     </div>
   </div>
 
@@ -458,6 +478,7 @@
     const themeModal = document.getElementById("themeModal");
     const openThemeModal = document.getElementById("openThemeModal");
     const closeThemeModal = document.getElementById("closeThemeModal");
+    const language = document.getElementById("language");
     const mode = document.getElementById("mode");
     const themePreset = document.getElementById("themePreset");
     const themeAccent = document.getElementById("themeAccent");
@@ -497,6 +518,7 @@
     const generateButton = document.getElementById("generate");
     const copyButton = document.getElementById("copy");
     const downloadButton = document.getElementById("download");
+    let currentLanguage = "ja";
     let previewRunning = false;
     let previewElapsedMs = 0;
     let previewRemaining = 0;
@@ -554,6 +576,131 @@
         bgStart: "#374151",
         bgEnd: "#111827",
         accent: "#06b6d4"
+      }
+    };
+
+    const I18N = {
+      ja: {
+        appTitle: "OBS Timer HTML Generator",
+        appSubtitle: "OBSの「ブラウザ」ソースに貼るためのHTMLを生成します。タイマー（カウントダウン）かストップウォッチ（カウントアップ）を選択できます。",
+        languageLabel: "言語",
+        openThemeModal: "テーマ設定",
+        modeLabel: "モード",
+        mode_countdown: "タイマー（カウントダウン）",
+        mode_stopwatch: "ストップウォッチ（カウントアップ）",
+        mode_pomodoro: "ポモドーロ",
+        hoursLabel: "開始時間（時）",
+        minutesLabel: "開始時間（分）",
+        secondsLabel: "開始時間（秒）",
+        fontSizeLabel: "文字サイズ（px）",
+        fontColorLabel: "文字色",
+        bgColorLabel: "背景色（透明は `transparent`）",
+        bgTransparentBtn: "背景透過",
+        textOpacityLabel: "文字の不透明度（%）",
+        pomodoroWorkLabel: "作業時間（分）",
+        pomodoroBreakLabel: "短休憩（分）",
+        pomodoroLongBreakLabel: "長休憩（分）",
+        pomodoroLongEveryLabel: "長休憩の間隔（作業回数）",
+        fontPresetLabel: "フォントプリセット",
+        font_system: "System Sans（標準）",
+        font_custom: "カスタム（下に入力）",
+        fontFamilyLabel: "カスタムフォント指定",
+        fontFamilyPlaceholder: "例: 'Helvetica Neue', Arial, sans-serif",
+        blinkOnEndLabel: "終了時に点滅（タイマーのみ）",
+        stopwatchTenthsLabel: "ストップウォッチで少数第一位を表示",
+        on: "ON",
+        off: "OFF",
+        generate: "HTMLを生成",
+        copy: "コードをコピー",
+        fileNameLabel: "保存ファイル名",
+        fileNamePlaceholder: "例: my-timer.html",
+        download: "指定名で保存",
+        usageHint: "使い方: 生成されたコードを新規 `timer.html` に保存し、OBSのブラウザソースでローカルファイル指定してください。幅/高さは任意です（例: 800x200）。",
+        previewLabel: "ライブプレビュー（文字色/フォント）",
+        previewStart: "スタート",
+        previewStop: "ストップ",
+        previewReset: "リセット",
+        outputLabel: "生成されたHTML",
+        themeModalTitle: "サイトテーマ設定",
+        closeThemeModal: "閉じる",
+        themePresetLabel: "サイトテーマ",
+        theme_navy: "Navy（現在）",
+        themeAccentLabel: "アクセントカラー",
+        themeBgStartLabel: "背景色（開始）",
+        themeBgEndLabel: "背景色（終了）",
+        themeHint: "テーマは設定ページ全体の見た目にのみ適用されます（生成される timer.html の見た目には影響しません）。",
+        copy_done: "コピーしました",
+        copy_failed: "コピー失敗",
+        status_running: "実行中",
+        status_paused: "停止中",
+        preview_timer: "タイマー",
+        preview_stopwatch: "ストップウォッチ",
+        preview_pomodoro: "ポモドーロ",
+        setLabel: "セット",
+        phase_work: "作業",
+        phase_break: "休憩",
+        phase_long_break: "長休憩"
+      },
+      en: {
+        appTitle: "OBS Timer HTML Generator",
+        appSubtitle: "Generate HTML for OBS Browser Source. You can choose Countdown Timer, Stopwatch, or Pomodoro.",
+        languageLabel: "Language",
+        openThemeModal: "Theme Settings",
+        modeLabel: "Mode",
+        mode_countdown: "Timer (Countdown)",
+        mode_stopwatch: "Stopwatch (Count Up)",
+        mode_pomodoro: "Pomodoro",
+        hoursLabel: "Start Time (Hours)",
+        minutesLabel: "Start Time (Minutes)",
+        secondsLabel: "Start Time (Seconds)",
+        fontSizeLabel: "Font Size (px)",
+        fontColorLabel: "Text Color",
+        bgColorLabel: "Background Color (`transparent` for clear)",
+        bgTransparentBtn: "Transparent BG",
+        textOpacityLabel: "Text Opacity (%)",
+        pomodoroWorkLabel: "Work Duration (min)",
+        pomodoroBreakLabel: "Short Break (min)",
+        pomodoroLongBreakLabel: "Long Break (min)",
+        pomodoroLongEveryLabel: "Long Break Every (work sessions)",
+        fontPresetLabel: "Font Preset",
+        font_system: "System Sans (Default)",
+        font_custom: "Custom (manual below)",
+        fontFamilyLabel: "Custom Font Family",
+        fontFamilyPlaceholder: "e.g. 'Helvetica Neue', Arial, sans-serif",
+        blinkOnEndLabel: "Blink on End (Timer only)",
+        stopwatchTenthsLabel: "Show tenths in Stopwatch",
+        on: "ON",
+        off: "OFF",
+        generate: "Generate HTML",
+        copy: "Copy Code",
+        fileNameLabel: "Save File Name",
+        fileNamePlaceholder: "e.g. my-timer.html",
+        download: "Save with Name",
+        usageHint: "Usage: save the generated code as `timer.html`, then load it as a local file in OBS Browser Source. Width/height are optional (e.g. 800x200).",
+        previewLabel: "Live Preview (color/font)",
+        previewStart: "Start",
+        previewStop: "Stop",
+        previewReset: "Reset",
+        outputLabel: "Generated HTML",
+        themeModalTitle: "Site Theme Settings",
+        closeThemeModal: "Close",
+        themePresetLabel: "Site Theme",
+        theme_navy: "Navy (Default)",
+        themeAccentLabel: "Accent Color",
+        themeBgStartLabel: "Background Start",
+        themeBgEndLabel: "Background End",
+        themeHint: "Theme affects only this settings page (not the generated timer.html appearance).",
+        copy_done: "Copied",
+        copy_failed: "Copy failed",
+        status_running: "Running",
+        status_paused: "Paused",
+        preview_timer: "Timer",
+        preview_stopwatch: "Stopwatch",
+        preview_pomodoro: "Pomodoro",
+        setLabel: "Set",
+        phase_work: "WORK",
+        phase_break: "BREAK",
+        phase_long_break: "LONG BREAK"
       }
     };
 
@@ -654,6 +801,82 @@
       themeModal.setAttribute("aria-hidden", open ? "false" : "true");
     }
 
+    function t(key) {
+      return (I18N[currentLanguage] && I18N[currentLanguage][key]) || I18N.ja[key] || key;
+    }
+
+    function setText(id, key) {
+      const el = document.getElementById(id);
+      if (el) {
+        el.textContent = t(key);
+      }
+    }
+
+    function setOptionText(selectEl, value, key) {
+      const option = selectEl.querySelector(`option[value="${value}"]`);
+      if (option) {
+        option.textContent = t(key);
+      }
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = currentLanguage;
+      setText("appTitle", "appTitle");
+      setText("appSubtitle", "appSubtitle");
+      setText("languageLabel", "languageLabel");
+      setText("openThemeModal", "openThemeModal");
+      setText("modeLabel", "modeLabel");
+      setOptionText(mode, "countdown", "mode_countdown");
+      setOptionText(mode, "stopwatch", "mode_stopwatch");
+      setOptionText(mode, "pomodoro", "mode_pomodoro");
+      setText("hoursLabel", "hoursLabel");
+      setText("minutesLabel", "minutesLabel");
+      setText("secondsLabel", "secondsLabel");
+      setText("fontSizeLabel", "fontSizeLabel");
+      setText("fontColorLabel", "fontColorLabel");
+      setText("bgColorLabel", "bgColorLabel");
+      setText("bgTransparentBtn", "bgTransparentBtn");
+      setText("textOpacityLabel", "textOpacityLabel");
+      setText("pomodoroWorkLabel", "pomodoroWorkLabel");
+      setText("pomodoroBreakLabel", "pomodoroBreakLabel");
+      setText("pomodoroLongBreakLabel", "pomodoroLongBreakLabel");
+      setText("pomodoroLongEveryLabel", "pomodoroLongEveryLabel");
+      setText("fontPresetLabel", "fontPresetLabel");
+      setOptionText(fontPreset, "system", "font_system");
+      setOptionText(fontPreset, "custom", "font_custom");
+      setText("fontFamilyLabel", "fontFamilyLabel");
+      fontFamily.placeholder = t("fontFamilyPlaceholder");
+      setText("blinkOnEndLabel", "blinkOnEndLabel");
+      setText("stopwatchTenthsLabel", "stopwatchTenthsLabel");
+      setOptionText(blinkOnEnd, "true", "on");
+      setOptionText(blinkOnEnd, "false", "off");
+      setOptionText(stopwatchTenths, "true", "on");
+      setOptionText(stopwatchTenths, "false", "off");
+      setText("generate", "generate");
+      setText("copy", "copy");
+      setText("fileNameLabel", "fileNameLabel");
+      fileName.placeholder = t("fileNamePlaceholder");
+      setText("download", "download");
+      setText("usageHint", "usageHint");
+      setText("previewLabel", "previewLabel");
+      setText("previewStart", "previewStart");
+      setText("previewStop", "previewStop");
+      setText("previewReset", "previewReset");
+      setText("outputLabel", "outputLabel");
+      setText("themeModalTitle", "themeModalTitle");
+      setText("closeThemeModal", "closeThemeModal");
+      setText("themePresetLabel", "themePresetLabel");
+      setOptionText(themePreset, "navy", "theme_navy");
+      setText("themeAccentLabel", "themeAccentLabel");
+      setText("themeBgStartLabel", "themeBgStartLabel");
+      setText("themeBgEndLabel", "themeBgEndLabel");
+      setText("themeHint", "themeHint");
+      if (!output.value || copyButton.textContent === I18N.ja.copy || copyButton.textContent === I18N.en.copy) {
+        copyButton.textContent = t("copy");
+      }
+      renderPreviewTimer(getConfig());
+    }
+
     function getFontConfig() {
       if (fontPreset.value === "custom") {
         return {
@@ -709,35 +932,36 @@
 
     function getPreviewPhaseLabel() {
       return previewPomodoroPhase === "work"
-        ? "WORK"
+        ? t("phase_work")
         : previewPomodoroPhase === "shortBreak"
-          ? "BREAK"
-          : "LONG BREAK";
+          ? t("phase_break")
+          : t("phase_long_break");
     }
 
     function getPreviewSetLabel(config) {
       const cycle = Math.max(2, config.pomodoroLongBreakEvery);
       if (previewPomodoroPhase === "work") {
-        return `Set ${(previewPomodoroWorkCount % cycle) + 1}/${cycle}`;
+        return `${t("setLabel")} ${(previewPomodoroWorkCount % cycle) + 1}/${cycle}`;
       }
       const completedInCycle = previewPomodoroWorkCount % cycle;
       const setNumber = completedInCycle === 0 ? cycle : completedInCycle;
-      return `Set ${setNumber}/${cycle}`;
+      return `${t("setLabel")} ${setNumber}/${cycle}`;
     }
 
     function renderPreviewTimer(config) {
+      const status = previewRunning ? t("status_running") : t("status_paused");
       if (config.mode === "countdown") {
         previewTime.textContent = formatDisplay(previewRemaining);
-        previewMeta.textContent = previewRunning ? "Timer: Running" : "Timer: Paused";
+        previewMeta.textContent = `${t("preview_timer")}: ${status}`;
         return;
       }
       if (config.mode === "pomodoro") {
         previewTime.textContent = formatDisplay(previewPomodoroRemaining);
-        previewMeta.textContent = `Pomodoro: ${getPreviewPhaseLabel()} | ${getPreviewSetLabel(config)} (${previewRunning ? "Running" : "Paused"})`;
+        previewMeta.textContent = `${t("preview_pomodoro")}: ${getPreviewPhaseLabel()} | ${getPreviewSetLabel(config)} (${status})`;
         return;
       }
       previewTime.textContent = formatStopwatchMs(previewElapsedMs, config.stopwatchShowTenths);
-      previewMeta.textContent = previewRunning ? "Stopwatch: Running" : "Stopwatch: Paused";
+      previewMeta.textContent = `${t("preview_stopwatch")}: ${status}`;
     }
 
     function resetPreviewState() {
@@ -1098,13 +1322,13 @@
 
       try {
         await navigator.clipboard.writeText(output.value);
-        copyButton.textContent = "コピーしました";
+        copyButton.textContent = t("copy_done");
       } catch (_) {
-        copyButton.textContent = "コピー失敗";
+        copyButton.textContent = t("copy_failed");
       }
 
       setTimeout(() => {
-        copyButton.textContent = "コードをコピー";
+        copyButton.textContent = t("copy");
       }, 1400);
     }
 
@@ -1150,6 +1374,10 @@
     [themeAccent, themeBgStart, themeBgEnd].forEach((el) => {
       el.addEventListener("input", updateThemeUI);
       el.addEventListener("change", updateThemeUI);
+    });
+    language.addEventListener("change", () => {
+      currentLanguage = language.value;
+      applyLanguage();
     });
     mode.addEventListener("change", () => {
       updateModeUI();
@@ -1206,6 +1434,8 @@
     });
 
     updateThemeUI();
+    currentLanguage = language.value;
+    applyLanguage();
     setThemeModalOpen(false);
     updateModeUI();
     updateFontUI();
