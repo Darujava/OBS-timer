@@ -1,29 +1,52 @@
 # OBS Timer HTML Generator
 
+<p align="center">
+  <a href="https://darujava.github.io/OBS-timer/">
+    <img src="https://img.shields.io/badge/Live-Demo-brightgreen?style=for-the-badge">
+  </a>
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge">
+  <img src="https://img.shields.io/badge/Streaming-OBS%20%7C%20Streamlabs-orange?style=for-the-badge">
+</p>
+
 ![OBS Timer Screenshot](Screenshot.png)
 
-A web-based generator for creating customizable HTML timers for streaming.
+A professional HTML timer generator designed for streamers.
 
-This tool allows you to generate ready-to-use HTML files for:
+Create customizable, ready-to-use HTML timer overlays for:
 
 - Timer
 - Stopwatch
 - Pomodoro Timer
 
-🌐 Live Site:  
-https://darujava.github.io/OBS-timer/
+---
+
+## 🚀 Live Demo
+
+👉 **https://darujava.github.io/OBS-timer/**
+
+Launch the generator directly in your browser — no installation required.
 
 ---
 
-## 🔧 Features
+## ✨ Features
 
-- Generate standalone HTML files
+- Standalone HTML file generation
 - Custom background color
 - Custom text color
-- Adjustable timer settings
+- Adjustable timer duration
 - Pomodoro interval configuration
+- Japanese / English language support
 - Works as Media Source
 - Works as Browser Source
+- Lightweight and fast
+
+---
+
+## 🌎 English Interface
+
+![OBS Timer English Screenshot](Screenshot-english.png)
+
+The interface is fully available in English for international streamers.
 
 ---
 
@@ -34,40 +57,50 @@ https://darujava.github.io/OBS-timer/
 
 ---
 
-## 🚀 How to Use
+## 🛠 Usage
 
-### Method 1: Use Generated HTML (Local File)
+### Method 1 — Local HTML File
 
-1. Open the generator site  
+1. Open the Live Demo  
 2. Configure your timer  
 3. Download the generated HTML file  
 4. In OBS:
    - Add **Media Source**
-   - Enable "Local File"
-   - Select the generated HTML file
+   - Enable **Local File**
+   - Select the generated file  
 
 ---
 
-### Method 2: Use as Browser Source
+### Method 2 — Browser Source
 
-1. Open the GitHub Pages site  
+1. Open the Live Demo  
 2. Configure your timer  
-3. Use generated file or URL  
-4. In OBS:
+3. In OBS:
    - Add **Browser Source**
-   - Set width / height (example: 800x600)
-   - Load the file
+   - Set width / height (example: 800×600)
+   - Load the file or URL  
 
 ---
 
-## 🎨 Customization
-
-You can customize:
+## 🎨 Customization Options
 
 - Timer duration
+- Pomodoro work / break intervals
 - Background color
 - Text color
-- Pomodoro intervals
+- Language (JP / EN)
+
+---
+
+## 📦 Project Structure
+
+```
+index.html
+script.js
+style.css
+Screenshot.png
+Screenshot-english.png
+```
 
 ---
 
