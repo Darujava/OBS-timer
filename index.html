@@ -189,6 +189,24 @@
       gap: 8px;
     }
 
+    .preview-bar-container {
+      width: 76%;
+      height: 14px;
+      margin: 10px auto 0;
+      background: rgba(255, 255, 255, 0.16);
+      border: 1px solid rgba(255, 255, 255, 0.35);
+      border-radius: 999px;
+      overflow: hidden;
+      display: none;
+    }
+
+    .preview-bar {
+      height: 100%;
+      width: 100%;
+      background: #78dcff;
+      transition: width 0.15s linear, background 0.25s ease, opacity 0.4s ease;
+    }
+
     .pomodoro-options {
       display: grid;
       gap: 12px;
@@ -400,6 +418,25 @@
         </div>
       </div>
 
+      <div>
+        <label id="progressBarLabel" for="progressBarEnabled">進捗バーを表示（OBSタイマー）</label>
+        <select id="progressBarEnabled">
+          <option value="true">ON</option>
+          <option value="false">OFF</option>
+        </select>
+      </div>
+
+      <div class="row">
+        <div>
+          <label id="progressColorStartLabel" for="progressColorStart">バー色（開始）</label>
+          <input id="progressColorStart" type="color" value="#78dcff" />
+        </div>
+        <div>
+          <label id="progressColorEndLabel" for="progressColorEnd">バー色（終了）</label>
+          <input id="progressColorEnd" type="color" value="#ff7878" />
+        </div>
+      </div>
+
       <div class="buttons">
         <button id="generate" class="btn-primary">HTMLを生成</button>
         <button id="copy">コードをコピー</button>
@@ -425,6 +462,9 @@
         <div id="previewStage" class="preview-stage">
           <div id="previewTime" class="preview-time">00:05:00</div>
         </div>
+        <div id="previewBarContainer" class="preview-bar-container">
+          <div id="previewBar" class="preview-bar"></div>
+        </div>
         <p id="previewMeta" class="preview-meta">Timer preview</p>
         <div class="preview-buttons">
           <button id="previewStart" type="button" class="btn-primary">スタート</button>
@@ -448,10 +488,9 @@
         <div>
           <label id="themePresetLabel" for="themePreset">サイトテーマ</label>
           <select id="themePreset">
-            <option value="navy">Navy（現在）</option>
-            <option value="emerald">Emerald</option>
-            <option value="sunset">Sunset</option>
-            <option value="graphite">Graphite</option>
+            <option value="white">White</option>
+            <option value="black">Black</option>
+            <option value="navy" selected>Navy（現在）</option>
             <option value="custom">Custom</option>
           </select>
         </div>
@@ -506,10 +545,15 @@
     const fontFamily = document.getElementById("fontFamily");
     const blinkOnEnd = document.getElementById("blinkOnEnd");
     const stopwatchTenths = document.getElementById("stopwatchTenths");
+    const progressBarEnabled = document.getElementById("progressBarEnabled");
+    const progressColorStart = document.getElementById("progressColorStart");
+    const progressColorEnd = document.getElementById("progressColorEnd");
     const fileName = document.getElementById("fileName");
     const output = document.getElementById("output");
     const previewStage = document.getElementById("previewStage");
     const previewTime = document.getElementById("previewTime");
+    const previewBarContainer = document.getElementById("previewBarContainer");
+    const previewBar = document.getElementById("previewBar");
     const previewMeta = document.getElementById("previewMeta");
     const previewStart = document.getElementById("previewStart");
     const previewStop = document.getElementById("previewStop");
@@ -557,25 +601,20 @@
     };
 
     const THEME_PRESETS = {
+      white: {
+        bgStart: "#f8fafc",
+        bgEnd: "#e2e8f0",
+        accent: "#0ea5e9"
+      },
+      black: {
+        bgStart: "#111111",
+        bgEnd: "#000000",
+        accent: "#22d3ee"
+      },
       navy: {
         bgStart: "#1e293b",
         bgEnd: "#0f172a",
         accent: "#22c55e"
-      },
-      emerald: {
-        bgStart: "#064e3b",
-        bgEnd: "#022c22",
-        accent: "#34d399"
-      },
-      sunset: {
-        bgStart: "#7c2d12",
-        bgEnd: "#3b0764",
-        accent: "#f97316"
-      },
-      graphite: {
-        bgStart: "#374151",
-        bgEnd: "#111827",
-        accent: "#06b6d4"
       }
     };
 
@@ -608,6 +647,9 @@
         fontFamilyPlaceholder: "例: 'Helvetica Neue', Arial, sans-serif",
         blinkOnEndLabel: "終了時に点滅（タイマーのみ）",
         stopwatchTenthsLabel: "ストップウォッチで少数第一位を表示",
+        progressBarLabel: "進捗バーを表示（OBSタイマー）",
+        progressColorStartLabel: "バー色（開始）",
+        progressColorEndLabel: "バー色（終了）",
         on: "ON",
         off: "OFF",
         generate: "HTMLを生成",
@@ -624,7 +666,10 @@
         themeModalTitle: "サイトテーマ設定",
         closeThemeModal: "閉じる",
         themePresetLabel: "サイトテーマ",
+        theme_white: "White",
+        theme_black: "Black",
         theme_navy: "Navy（現在）",
+        theme_custom: "Custom",
         themeAccentLabel: "アクセントカラー",
         themeBgStartLabel: "背景色（開始）",
         themeBgEndLabel: "背景色（終了）",
@@ -669,6 +714,9 @@
         fontFamilyPlaceholder: "e.g. 'Helvetica Neue', Arial, sans-serif",
         blinkOnEndLabel: "Blink on End (Timer only)",
         stopwatchTenthsLabel: "Show tenths in Stopwatch",
+        progressBarLabel: "Show Progress Bar (OBS Timer)",
+        progressColorStartLabel: "Bar Color (Start)",
+        progressColorEndLabel: "Bar Color (End)",
         on: "ON",
         off: "OFF",
         generate: "Generate HTML",
@@ -685,7 +733,10 @@
         themeModalTitle: "Site Theme Settings",
         closeThemeModal: "Close",
         themePresetLabel: "Site Theme",
+        theme_white: "White",
+        theme_black: "Black",
         theme_navy: "Navy (Default)",
+        theme_custom: "Custom",
         themeAccentLabel: "Accent Color",
         themeBgStartLabel: "Background Start",
         themeBgEndLabel: "Background End",
@@ -848,10 +899,15 @@
       fontFamily.placeholder = t("fontFamilyPlaceholder");
       setText("blinkOnEndLabel", "blinkOnEndLabel");
       setText("stopwatchTenthsLabel", "stopwatchTenthsLabel");
+      setText("progressBarLabel", "progressBarLabel");
+      setText("progressColorStartLabel", "progressColorStartLabel");
+      setText("progressColorEndLabel", "progressColorEndLabel");
       setOptionText(blinkOnEnd, "true", "on");
       setOptionText(blinkOnEnd, "false", "off");
       setOptionText(stopwatchTenths, "true", "on");
       setOptionText(stopwatchTenths, "false", "off");
+      setOptionText(progressBarEnabled, "true", "on");
+      setOptionText(progressBarEnabled, "false", "off");
       setText("generate", "generate");
       setText("copy", "copy");
       setText("fileNameLabel", "fileNameLabel");
@@ -866,7 +922,10 @@
       setText("themeModalTitle", "themeModalTitle");
       setText("closeThemeModal", "closeThemeModal");
       setText("themePresetLabel", "themePresetLabel");
+      setOptionText(themePreset, "white", "theme_white");
+      setOptionText(themePreset, "black", "theme_black");
       setOptionText(themePreset, "navy", "theme_navy");
+      setOptionText(themePreset, "custom", "theme_custom");
       setText("themeAccentLabel", "themeAccentLabel");
       setText("themeBgStartLabel", "themeBgStartLabel");
       setText("themeBgEndLabel", "themeBgEndLabel");
@@ -919,7 +978,10 @@
         fontFamily: selectedFont.cssFamily,
         fontImportUrl: selectedFont.importUrl,
         blinkOnEnd: blinkOnEnd.value === "true",
-        stopwatchShowTenths: stopwatchTenths.value === "true"
+        stopwatchShowTenths: stopwatchTenths.value === "true",
+        showProgressBar: progressBarEnabled.value === "true",
+        progressColorStart: normalizeHex(progressColorStart.value) || "#78dcff",
+        progressColorEnd: normalizeHex(progressColorEnd.value) || "#ff7878"
       };
     }
 
@@ -953,15 +1015,38 @@
       if (config.mode === "countdown") {
         previewTime.textContent = formatDisplay(previewRemaining);
         previewMeta.textContent = `${t("preview_timer")}: ${status}`;
+        updatePreviewProgressBar(config);
         return;
       }
       if (config.mode === "pomodoro") {
         previewTime.textContent = formatDisplay(previewPomodoroRemaining);
         previewMeta.textContent = `${t("preview_pomodoro")}: ${getPreviewPhaseLabel()} | ${getPreviewSetLabel(config)} (${status})`;
+        updatePreviewProgressBar(config);
         return;
       }
       previewTime.textContent = formatStopwatchMs(previewElapsedMs, config.stopwatchShowTenths);
       previewMeta.textContent = `${t("preview_stopwatch")}: ${status}`;
+      updatePreviewProgressBar(config);
+    }
+
+    function updatePreviewProgressBar(config) {
+      if (!config.showProgressBar || config.mode === "stopwatch") {
+        previewBarContainer.style.display = "none";
+        return;
+      }
+      previewBarContainer.style.display = "block";
+      const total = config.mode === "countdown"
+        ? Math.max(1, config.totalSeconds)
+        : Math.max(1, previewPomodoroPhase === "work"
+          ? config.pomodoroWorkSeconds
+          : previewPomodoroPhase === "shortBreak"
+            ? config.pomodoroBreakSeconds
+            : config.pomodoroLongBreakSeconds);
+      const current = config.mode === "countdown" ? previewRemaining : previewPomodoroRemaining;
+      const percent = Math.max(0, Math.min(100, (current / total) * 100));
+      previewBar.style.width = `${percent}%`;
+      previewBar.style.background = `linear-gradient(90deg, ${config.progressColorStart} 0%, ${config.progressColorEnd} 100%)`;
+      previewBar.style.opacity = percent === 0 ? "0.2" : "1";
     }
 
     function resetPreviewState() {
@@ -1160,6 +1245,24 @@
       user-select: none;
     }
 
+    #bar-container {
+      width: min(52vw, 520px);
+      height: 20px;
+      background: rgba(255, 255, 255, 0.16);
+      border: 2px solid rgba(255, 255, 255, 0.35);
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 0 10px rgba(0,0,0,0.25);
+      display: ${config.showProgressBar ? "block" : "none"};
+    }
+
+    #bar {
+      height: 100%;
+      width: 100%;
+      background: linear-gradient(90deg, ${esc(config.progressColorStart)} 0%, ${esc(config.progressColorEnd)} 100%);
+      transition: width 0.15s linear, background 0.3s ease, opacity 0.5s ease;
+    }
+
     .blink {
       animation: blink 1s step-end infinite;
     }
@@ -1172,11 +1275,15 @@
 <body>
   <div id="state"></div>
   <div id="time">00:00:00</div>
+  <div id="bar-container"><div id="bar"></div></div>
 
   <script>
     const MODE = "${esc(config.mode)}";
     const BLINK_ON_END = ${config.blinkOnEnd};
     const STOPWATCH_SHOW_TENTHS = ${config.stopwatchShowTenths};
+    const SHOW_PROGRESS_BAR = ${config.showProgressBar};
+    const PROGRESS_COLOR_START = "${esc(config.progressColorStart)}";
+    const PROGRESS_COLOR_END = "${esc(config.progressColorEnd)}";
     const INITIAL_SECONDS = ${config.totalSeconds};
     const POMODORO_WORK_SECONDS = ${config.pomodoroWorkSeconds};
     const POMODORO_BREAK_SECONDS = ${config.pomodoroBreakSeconds};
@@ -1185,11 +1292,14 @@
 
     const timeEl = document.getElementById("time");
     const stateEl = document.getElementById("state");
+    const barContainerEl = document.getElementById("bar-container");
+    const barEl = document.getElementById("bar");
     let elapsedMs = 0;
     let remaining = INITIAL_SECONDS;
     let pomodoroWorkCount = 0;
     let pomodoroPhase = "work";
     let pomodoroRemaining = POMODORO_WORK_SECONDS;
+    let currentPhaseTotal = POMODORO_WORK_SECONDS;
 
     function pad(value) {
       return String(value).padStart(2, "0");
@@ -1220,6 +1330,28 @@
       timeEl.textContent = formatStopwatch(elapsedMs);
     }
 
+    function updateProgressBar() {
+      if (!SHOW_PROGRESS_BAR) {
+        barContainerEl.style.display = "none";
+        return;
+      }
+      if (MODE === "stopwatch") {
+        barContainerEl.style.display = "none";
+        return;
+      }
+      barContainerEl.style.display = "block";
+      const total = MODE === "countdown" ? Math.max(1, INITIAL_SECONDS) : Math.max(1, currentPhaseTotal);
+      const current = MODE === "countdown" ? remaining : pomodoroRemaining;
+      const percent = Math.max(0, Math.min(100, (current / total) * 100));
+      barEl.style.width = percent + "%";
+      barEl.style.background = "linear-gradient(90deg, " + PROGRESS_COLOR_START + " 0%, " + PROGRESS_COLOR_END + " 100%)";
+      if (percent === 0) {
+        barEl.style.opacity = "0.2";
+      } else {
+        barEl.style.opacity = "1";
+      }
+    }
+
     function updatePomodoroStateLabel() {
       if (MODE !== "pomodoro") {
         stateEl.textContent = "";
@@ -1248,16 +1380,20 @@
         if (pomodoroWorkCount % POMODORO_LONG_BREAK_EVERY === 0) {
           pomodoroPhase = "longBreak";
           pomodoroRemaining = POMODORO_LONG_BREAK_SECONDS;
+          currentPhaseTotal = POMODORO_LONG_BREAK_SECONDS;
         } else {
           pomodoroPhase = "shortBreak";
           pomodoroRemaining = POMODORO_BREAK_SECONDS;
+          currentPhaseTotal = POMODORO_BREAK_SECONDS;
         }
       } else {
         pomodoroPhase = "work";
         pomodoroRemaining = POMODORO_WORK_SECONDS;
+        currentPhaseTotal = POMODORO_WORK_SECONDS;
       }
       updatePomodoroStateLabel();
       renderSeconds(pomodoroRemaining);
+      updateProgressBar();
     }
 
     function tick() {
@@ -1265,6 +1401,7 @@
         if (pomodoroRemaining > 0) {
           pomodoroRemaining -= 1;
           renderSeconds(pomodoroRemaining);
+          updateProgressBar();
           if (pomodoroRemaining === 0) {
             nextPomodoroPhase();
           }
@@ -1276,6 +1413,7 @@
         if (remaining > 0) {
           remaining -= 1;
           renderSeconds(remaining);
+          updateProgressBar();
           if (remaining === 0 && BLINK_ON_END) {
             timeEl.classList.add("blink");
           }
@@ -1293,15 +1431,19 @@
 
     if (MODE === "countdown") {
       renderSeconds(remaining);
+      updateProgressBar();
       if (remaining === 0 && BLINK_ON_END) {
         timeEl.classList.add("blink");
       }
     } else if (MODE === "pomodoro") {
+      currentPhaseTotal = POMODORO_WORK_SECONDS;
       updatePomodoroStateLabel();
       renderSeconds(pomodoroRemaining);
+      updateProgressBar();
     } else {
       renderStopwatch();
       stateEl.textContent = "";
+      updateProgressBar();
     }
 
     const intervalMs = MODE === "stopwatch" && STOPWATCH_SHOW_TENTHS ? 100 : 1000;
@@ -1427,7 +1569,10 @@
       fontSize,
       textOpacity,
       fontFamily,
-      stopwatchTenths
+      stopwatchTenths,
+      progressBarEnabled,
+      progressColorStart,
+      progressColorEnd
     ].forEach((el) => {
       el.addEventListener("input", updatePreview);
       el.addEventListener("change", updatePreview);
